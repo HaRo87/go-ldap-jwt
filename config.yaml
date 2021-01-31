@@ -1,0 +1,16 @@
+servers:
+  - protocol: ldaps
+    host: some-ldap-server.com
+    port: 636
+user: 
+  name: testuser
+  password: test1234 
+groups:
+  objectclass: user
+  memberattribute: memberOf
+  definitions:
+  - some-group
+  - some-other-group
+jwt:
+  expire: 30m
+  signingkey: somekey

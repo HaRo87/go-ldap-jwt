@@ -12,6 +12,7 @@ type Config struct {
 	Servers []Server      `yaml:"servers"`
 	User    BindUser      `yaml:"user"`
 	Groups  AllowedGroups `yaml:"groups"`
+	JWT     JWT           `yaml:"jwt"`
 }
 
 // Server represents the server config portion for
@@ -37,11 +38,18 @@ type AllowedGroups struct {
 	Definitions     []string `yaml:"definitions"`
 }
 
+// JWT represents the JWT configuration
+type JWT struct {
+	Expiration string `yaml:"expire"`
+	SigningKey string `yaml:"signingkey"`
+}
+
 const defaultProtocol = "ldaps"
 const defaultPort = 636
 const defaultObjectClass = "user"
 const defaultMemberAttribute = "memberOf"
 const secretsLocation = "/run/secrets/"
+const defaultExpiration = "5m"
 
 // GetConfig reads the provided config file and
 // performs some checks
@@ -115,6 +123,22 @@ func GetConfig(path, secrets string) (Config, error) {
 			if strings.TrimSpace(groupDefinitions) == "" {
 				return config, fmt.Errorf("No valid group definition provided")
 			}
+		}
+
+		if strings.TrimSpace(config.JWT.Expiration) == "" {
+			config.JWT.Expiration = defaultExpiration
+		}
+
+		if strings.TrimSpace(config.JWT.SigningKey) == "" {
+			return config, fmt.Errorf("No signing key provided for JWT")
+		}
+		if strings.Contains(config.JWT.SigningKey, secrets) {
+			var signingKey []byte
+			signingKey, err = ioutil.ReadFile(config.JWT.SigningKey)
+			if err != nil {
+				return config, fmt.Errorf("Unable to obtain signing key from: %s", config.JWT.SigningKey)
+			}
+			config.JWT.SigningKey = string(signingKey)
 		}
 	}
 

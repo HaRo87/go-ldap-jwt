@@ -53,23 +53,25 @@ func LoadConfig() {
 
 # Servers config
 servers:
-  -
-    protocol: ldaps # defaults to ldaps if not provided
+  - protocol: ldaps # defaults to ldaps if not provided
     host: some-ldap-server.com
     port: 636 # defaults to 636 if not provided
-
 # Bind user config
 # can also work with reading secrets from file
 user: 
   name: testuser
   password: test1234 
-
 # Groups config
 groups:
   objectclass: user # defaults to user if not provided
   memberattribute: memberOf # defaults to memberOf if not provided
+  definitions:
   - some-group
   - some-other-group
+# JWT config
+jwt:
+  expire: 30m
+  signingkey: somekey
 ```
 
 ## ⚠️ License
