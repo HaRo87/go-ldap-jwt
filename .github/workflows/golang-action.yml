@@ -13,3 +13,13 @@ jobs:
         args: go test -race -coverprofile=coverage.txt -covermode=atomic ./...
       env:
         GO111MODULE: "on"
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v1
+      with:
+        file: ./coverage.txt
+        flags: unittests
+        name: codecov-umbrella
+        env_vars: OS,GOLANG
+        fail_ci_if_error: true
+        path_to_write_report: ./codecov_report.gz
